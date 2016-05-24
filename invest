@@ -1,0 +1,89 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+public class invest {
+	public static String buyOrSell(int index, List<Double> info) {
+		String ans = "";
+		if (info.get(index) < info.get(index + 1)) {
+			if (info.get(index + 1) < info.get(index + 2)) {
+				if (info.get(index + 2) < info.get(index + 3)) {
+					if (info.get(index + 3) > info.get(index + 4)) {
+						ans = "sell";
+					}
+				}
+			}
+		} else if (info.get(index) > info.get(index + 1)) {
+			if (info.get(index + 1) > info.get(index + 2)) {
+				if (info.get(index + 2) > info.get(index + 3)) {
+					if (info.get(index + 3) < info.get(index + 4)) {
+						ans = "buy";
+					}
+				}
+			}
+		} else {
+			ans = "";
+		}
+		return ans;
+	}
+	
+	// This class converts cash to shares. This class is needed when buying shares.
+	public static double cashToShares(double cash, double price) {
+		double ans = 0;
+		ans = cash/price;
+		return ans;
+	}
+	
+	// This class converts shares to cash. This class is needed when selling shares.
+	public static double sharesToCash(double shares, double price) {
+		double ans = 0;
+		ans = shares*price;
+		return ans;
+	}
+	
+	// This class returns the total amount of wealth you have in cash and in invested stocks.
+	public static double totalValue(double cash, double shares, double price) {
+		double ans = 0;
+		ans = cash + (shares*price);
+		return ans;
+	}
+
+	public static void main(String args[]) throws FileNotFoundException {
+		File text = new File("data/Disney");
+		Scanner scnr = new Scanner(text);
+		List<Double> prices = new ArrayList<Double>();
+		while (scnr.hasNextLine()) {
+			String line = scnr.nextLine();
+			double dprice = Double.parseDouble(line);
+			prices.add(dprice);
+		}
+		String[] statuses = new String[prices.size()];
+		statuses[0] = "";
+		statuses[1] = "";
+		statuses[2] = "";
+		statuses[3] = "";
+		for (int i = 0; i < statuses.length - 4; i++) {
+			statuses[i + 4] = pattern.buyOrSell(i, prices);
+		}
+		System.out.printf("%-10s %-10s %-10s %-10s %-10s\n", "period", "price", "cash", "shares", "value");
+		String lines = "---------------------------------------------------";
+		System.out.println(lines);
+		double cash = 10000;
+		double shares = 0.0;
+		double value = 0.0;
+		for (int i = 0; i < prices.size(); i++) {
+			if (statuses[i].equals("buy")) {
+				shares += invest.cashToShares(cash, prices.get(i));
+				cash = 0;
+			}
+			else if (statuses[i].equals("sell")) {
+				cash += invest.sharesToCash(shares, prices.get(i));
+				shares = 0;
+			}
+			value = invest.totalValue(cash, shares, prices.get(i));
+			System.out.printf("%-10s %-10.3f %-10.2f %-10.2f %-10.2f\n", (i + 1), prices.get(i), cash, shares, value);
+		}
+	}
+}
