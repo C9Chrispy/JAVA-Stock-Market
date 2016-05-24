@@ -1,0 +1,57 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+public class pattern {
+	// This class uses Dilbert's rule to print out text indicating whether or not to buy or sell a stock.
+	// 3 consecutive periods of decrease followed by 1 period of increase means you should buy the stock.
+	// 3 consecutive periods of increase followed by 1 period of decrease means you should sell the stock.
+	public static String buyOrSell(int index, List<Double> info) {
+		String ans = "";
+		if (info.get(index) < info.get(index + 1)) {
+			if (info.get(index + 1) < info.get(index + 2)) {
+				if (info.get(index + 2) < info.get(index + 3)) {
+					if (info.get(index + 3) > info.get(index + 4)) {
+						ans = "sell";
+					}
+				}
+			}
+		} else if (info.get(index) > info.get(index + 1)) {
+			if (info.get(index + 1) > info.get(index + 2)) {
+				if (info.get(index + 2) > info.get(index + 3)) {
+					if (info.get(index + 3) < info.get(index + 4)) {
+						ans = "buy";
+					}
+				}
+			}
+		} else {
+			ans = "";
+		}
+		return ans;
+	}
+
+	// The main function prints out a table of 3 columns: period, price, and whether or not you should buy or sell.
+	public static void main(String args[]) throws FileNotFoundException {
+		File text = new File("data/stock1000.txt");
+		Scanner scnr = new Scanner(text);
+		List<Double> prices = new ArrayList<Double>();
+		while (scnr.hasNextLine()) {
+			String line = scnr.nextLine();
+			double dprice = Double.parseDouble(line);
+			prices.add(dprice);
+		}
+		String[] statuses = new String[prices.size()];
+		statuses[0] = "";
+		statuses[1] = "";
+		statuses[2] = "";
+		statuses[3] = "";
+		for (int i = 0; i < statuses.length - 4; i++) {
+			statuses[i + 4] = pattern.buyOrSell(i, prices);
+		}
+		for (int i = 0; i < prices.size(); i++) {
+			System.out.printf("%-10s %-10.3f %-10s\n", (i + 1), prices.get(i), statuses[i]);
+		}
+	}
+}
